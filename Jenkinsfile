@@ -3,7 +3,7 @@
 
 pipeline {
     environment {
-        DOCKER_HOST = 'tcp://romantic_fermat:2375'
+        DOCKER_HOST = "tcp://romantic_fermat:2375"
         IMAGE_NAME = "staticwebsite"
         APP_CONTAINER_PORT = "5000"
         APP_EXPOSED_PORT = "80"
