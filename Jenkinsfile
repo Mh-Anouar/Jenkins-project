@@ -12,6 +12,9 @@ pipeline {
         DOCKERHUB_ID = "docker19191919"
         DOCKERHUB_PASSWORD = credentials('dockerhub_password')
     }
+
+
+    
     agent none
     stages {
        stage('Build image') {
