@@ -1,0 +1,45 @@
+name: static-website
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+      - test-cache
+
+env:
+  DOCKERHUB_ID: "docker19191919"
+  IMAGE_NAME: "staticwebsite"
+  IMAGE_TAG: "latest"
+  APP_CONTAINER_PORT: "80"
+  APP_EXPOSED_PORT: "80"
+
+jobs:
+  build_and_push:
+    name: BUILD AND PUSH DOCKER IMAGE
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the codebase
+        uses: actions/checkout@v2
+
+      - name: Build Docker Image
+        run: |
+          echo "Building Docker image..."
+          docker build -t ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG .
+          echo "Image built successfully."
+
+      - name: Verify Image Exists Locally
+        run: |
+          echo "Listing Docker images to verify the built image:"
+          docker images
+
+      - name: Login to Docker Hub
+        run: |
+          echo "Logging into Docker Hub..."
+          echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u $DOCKERHUB_ID --password-stdin
+
+      - name: Push Docker Image to Docker Hub
+        run: |
+          echo "Pushing Docker image to Docker Hub..."
+          docker push ${DOCKERHUB_ID}/$IMAGE_NAME:$IMAGE_TAG
+          echo "Docker image pushed successfully."
