@@ -2,7 +2,7 @@ pipeline {
     environment {
         IMAGE_NAME = "staticwebsite"
         APP_CONTAINER_PORT = "5000"
-        APP_EXPOSED_PORT = "8080"
+        APP_EXPOSED_PORT = "8082"
         IMAGE_TAG = "latest"
         STAGING = "chocoapp-jenkins-staging"
         PRODUCTION = "chocoapp-jenkins-prod"
@@ -43,7 +43,7 @@ pipeline {
             steps {
                 script {
                     bat """
-                        curl 172.28.128.123 | findstr Dimension
+                        curl 172.28.128.123:8082 | findstr Dimension
                     """
                 }
             }
