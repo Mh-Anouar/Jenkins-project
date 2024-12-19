@@ -39,17 +39,6 @@ pipeline {
                 }
             }
         }
-        stage('Test image') {
-            agent { label 'Windows docker worker node' }
-            steps {
-                script {
-                    bat """
-                        docker ps -a
-                        curl 172.28.128.123:8082 | findstr Dimension
-                    """
-                }
-            }
-        }
         stage('Clean container') {
             agent { label 'Windows docker worker node' }
             steps {
