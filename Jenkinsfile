@@ -44,6 +44,7 @@ pipeline {
             steps {
                 script {
                     bat """
+                        docker ps -a
                         curl 172.28.128.123:8082 | findstr Dimension
                     """
                 }
