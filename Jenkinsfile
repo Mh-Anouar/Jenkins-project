@@ -33,7 +33,7 @@ pipeline {
                         echo Cleaning existing container if exist
                         docker ps -a | findstr %IMAGE_NAME% && docker rm -f %IMAGE_NAME%
                         docker run --name %IMAGE_NAME% -d -p %APP_EXPOSED_PORT%:%APP_CONTAINER_PORT% -e PORT=%APP_CONTAINER_PORT% ${DOCKERHUB_ID}/%IMAGE_NAME%:%IMAGE_TAG%
-                        timeout 5
+                        timeout /t 5
                     """
                 }
             }
