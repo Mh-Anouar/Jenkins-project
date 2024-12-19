@@ -14,23 +14,27 @@ pipeline {
 
     stages {
         stage('Build image') {
-            agent { label 'Windows docker worker node' } // Utilisation de l'agent nommé
-            steps {
-                script {
-                    bat 'docker build -t ${DOCKERHUB_ID}/%IMAGE_NAME%:%IMAGE_TAG% .' // Utilisation de "bat" pour Windows
-                }
-            }
-        }
-        stage('Run container based on builded image') {
             agent { label 'Windows docker worker node' }
             steps {
                 script {
-                    bat '''
+                    def dockerHubIdLower = DOCKERHUB_ID.toLowerCase() // Conversion en minuscules
+                    echo "DOCKERHUB_ID: ${dockerHubIdLower}"
+                    bat """
+                        docker build -t ${dockerHubIdLower}/%IMAGE_NAME%:%IMAGE_TAG% .
+                    """
+                }
+            }
+        }
+        stage('Run container based on built image') {
+            agent { label 'Windows docker worker node' }
+            steps {
+                script {
+                    bat """
                         echo Cleaning existing container if exist
                         docker ps -a | findstr %IMAGE_NAME% && docker rm -f %IMAGE_NAME%
                         docker run --name %IMAGE_NAME% -d -p %APP_EXPOSED_PORT%:%APP_CONTAINER_PORT% -e PORT=%APP_CONTAINER_PORT% ${DOCKERHUB_ID}/%IMAGE_NAME%:%IMAGE_TAG%
                         timeout 5
-                    '''
+                    """
                 }
             }
         }
@@ -38,9 +42,9 @@ pipeline {
             agent { label 'Windows docker worker node' }
             steps {
                 script {
-                    bat '''
+                    bat """
                         curl 172.28.128.123 | findstr Dimension
-                    '''
+                    """
                 }
             }
         }
@@ -48,10 +52,10 @@ pipeline {
             agent { label 'Windows docker worker node' }
             steps {
                 script {
-                    bat '''
+                    bat """
                         docker stop %IMAGE_NAME%
                         docker rm %IMAGE_NAME%
-                    '''
+                    """
                 }
             }
         }
@@ -59,10 +63,11 @@ pipeline {
             agent { label 'Windows docker worker node' }
             steps {
                 script {
-                    bat '''
-                        echo %DOCKERHUB_PASSWORD% | docker login -u %DOCKERHUB_ID% --password-stdin
-                        docker push ${DOCKERHUB_ID}/%IMAGE_NAME%:%IMAGE_TAG%
-                    '''
+                    def dockerHubIdLower = DOCKERHUB_ID.toLowerCase() // Conversion en minuscules
+                    bat """
+                        echo ${DOCKERHUB_PASSWORD} | docker login -u ${dockerHubIdLower} --password-stdin
+                        docker push ${dockerHubIdLower}/%IMAGE_NAME%:%IMAGE_TAG%
+                    """
                 }
             }
         }
